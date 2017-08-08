@@ -8,7 +8,7 @@ RSpec.describe ApiGatekeeper do
       let(:user) { double(User, id: 239) }
 
       context "with a non expired token" do
-        let(:header) { valid_headers(user) }
+        let(:header) { valid_headers(user.id) }
 
         context "when user can't be found" do
           before do
