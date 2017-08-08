@@ -1,20 +1,25 @@
 require "rails_helper"
 
-RSpec.describe "Authentication", type: :request do
-  describe "POST /api/v1/auth/login" do
-    let(:headers) { valid_headers("213").except("Authorization") }
-    let(:credentials) {
+RSpec.describe AuthenticationController, type: :controller do
+  describe "#create" do
+    let(:email) { FFaker::Internet.email }
+    let(:password) { FFaker::Internet.password }
+    let(:params) {
       {
-        email: FFaker::Internet.email,
-        password: FFaker::Internet.password
-      }.to_json
+        email: email,
+        password: password,
+      }
     }
-    subject { post "/api/v1/auth/login", params: credentials, headers: headers }
+    subject { post :create, params: params, format: :json }
 
     context "with a valid email and password" do
       before do
         allow(Authenticator).to receive(:token_for_login).and_return("token")
         subject
+      end
+
+      it "calls the authenticator" do
+        expect(Authenticator).to have_received(:token_for_login).with(email, password)
       end
 
       it "returns an authentication token" do

@@ -1,3 +1,6 @@
 Rails.application.routes.draw do
-  post 'api/v1/auth/login', to: 'authentication#create'
+    scope "api/v1" do
+      post "authentication", to: "authentication#create"
+      post "signup", to: "users#create"
+    end
 end

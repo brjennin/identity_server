@@ -8,16 +8,20 @@ module TokenSpecHelper
   end
 
   def valid_headers(user_id)
-    {
+    json_only_headers.merge({
       "Authorization" => token_generator(user_id),
+    })
+  end
+
+  def json_only_headers
+    {
       "Content-Type" => "application/json"
     }
   end
 
   def invalid_headers
-    {
+    json_only_headers.merge({
       "Authorization" => nil,
-      "Content-Type" => "application/json"
-    }
+    })
   end
 end

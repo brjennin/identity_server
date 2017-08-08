@@ -44,4 +44,35 @@ RSpec.describe UserRepository do
       end
     end
   end
+
+  describe ".create" do
+    context "with valid date" do
+      subject { described_class.create("hunk@69.com", "password", "password") }
+
+      it "creates a new user" do
+        expect { subject }.to change { User.count }.by(1)
+      end
+
+      it "returns the user" do
+        record = subject
+        expect(record).to be_a_kind_of(User)
+        expect(record.email).to eq("hunk@69.com")
+        expect(record.password).to eq("password")
+        expect(record.password_confirmation).to eq("password")
+      end
+
+      it "puts an item in the database" do
+        expect(subject).to be_persisted
+        expect(subject).to eq(User.last)
+      end
+    end
+
+    context "with invalid data" do
+      subject { described_class.create("hunk@69.com", "password", "nope") }
+
+      it "raises an exception" do
+        expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+  end
 end
