@@ -46,4 +46,50 @@ RSpec.describe UsersController, type: :controller do
       end
     end
   end
+
+  describe "#show" do
+    subject {
+      get :show, params: {}, format: :json
+    }
+
+    context "when a current user can be found" do
+      let(:user) { double(User, as_json: {'test': 'value'}) }
+
+      before do
+        allow(ApiGatekeeper).to receive(:verify_user).and_return(user)
+        subject
+      end
+
+      it "calls the api gatekeeper" do
+        expect(ApiGatekeeper).to have_received(:verify_user).with(request.headers)
+      end
+
+      it "is successful" do
+        expect(response).to be_success
+      end
+
+      it "returns an authentication token" do
+        expect(json).to eq({'test' => 'value'})
+      end
+    end
+
+    context "when a current user can't be found" do
+      before do
+        allow(ApiGatekeeper).to receive(:verify_user).and_raise(ExceptionHandler::InvalidToken)
+        subject
+      end
+
+      it "calls the api gatekeeper" do
+        expect(ApiGatekeeper).to have_received(:verify_user).with(request.headers)
+      end
+
+      it "gives a 401 error code" do
+        expect(response.status).to eq(422)
+      end
+
+      it "returns an authentication token" do
+        expect(json).to eq({'message' => 'ExceptionHandler::InvalidToken'})
+      end
+    end
+  end
 end
